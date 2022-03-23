@@ -1,0 +1,47 @@
+###
+GET http://localhost:3000/consents/
+
+
+
+###
+POST http://localhost:3000/give-consent/
+Content-Type: application/json 
+
+{
+    "name": "Krupali",
+    "email": "krupali@gmail.com",
+    "consent_for" : "Receive NewsLatters"
+}
+
+
+###
+PUT http://localhost:3000/623abb58a90780b5a309ebeb
+Content-Type: application/json
+
+{
+   "email": "niya@gmail.com"
+}
+
+###
+DELETE http://localhost:3000/623abb58a90780b5a309ebeb
+
+###
+POST http://localhost:3000/users
+Content-Type: application/json 
+
+{
+    "username": "krupali2507",
+    "email": "kruapli@yahoo.com",
+    "password": "krupali@123"
+}
+
+### 
+GET http://localhost:3000/login 
+Content-Type: application/json 
+
+{
+    "username": "krupali2507",
+    "email": "kruapli@yahoo.com",
+    "password": "krupali@123"
+}
+
