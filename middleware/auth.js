@@ -3,8 +3,9 @@ const User = require("../models/user.model.js");
 
 module.exports = async (request, response, next) => {
   try {
-    let jwtToken;
+    let jwtToken = null;
     const authHeader = request.headers["authorization"];
+
     if (authHeader !== undefined) {
       jwtToken = authHeader.split(" ")[1];
       if (jwtToken === undefined) {
@@ -15,8 +16,8 @@ module.exports = async (request, response, next) => {
         request.user = data;
         next();
       }
-    } else{
-        response.status(400).send("Authorization should be there!")
+    } else {
+      response.status(400).send("Authorization should be there!");
     }
   } catch (err) {
     response.status(401).send(err);
