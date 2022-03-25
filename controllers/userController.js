@@ -1,17 +1,19 @@
 const User = require("../models/user.model.js");
 const Consent = require("../models/consent.model.js");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 
 exports.RegisterUser = async (request, response) => {
   try {
     const userDetail = request.body;
     const { username, email, password } = userDetail;
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const data = new User({
       username,
       email,
-      password,
+      password: hashedPassword,
     });
 
     await data.save();
@@ -26,15 +28,28 @@ exports.RegisterUser = async (request, response) => {
 exports.LoginUser = async (request, response) => {
   try {
     const { username, password } = request.body;
-    const data = await User.findOne({ username: username, password: password });
-    if (data) {
-      const payload = { id: data._id, username: username };
-      const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
-      response.status(400).send({ success: true, message: jwtToken });
+    const dbUser = await User.findOne({ username: username });
+    if (!dbUser) {
+      response.status(400).send("Invalid User");
     } else {
-      response
-        .status(200)
-        .send({ success: false, message: "Invalid Credentials!" });
+      const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
+      if (isPasswordMatched) {
+        const data = await User.findOne({
+          username: username,
+          password: dbUser.password,
+        });
+        if (data) {
+          const payload = { id: data._id, username: username };
+          const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+          response.status(200).send({ success: true, message: jwtToken });
+        } else {
+          response
+            .status(400)
+            .send({ success: false, message: "Invalid Credentials!" });
+        }
+      } else {
+        response.status(400).send("Invalid Password!");
+      }
     }
   } catch (err) {
     response.status(400).send({ success: false, message: err.message });
