@@ -27,19 +27,19 @@ exports.RegisterUser = async (request, response) => {
 
 exports.LoginUser = async (request, response) => {
   try {
-    const { username, password } = request.body;
-    const dbUser = await User.findOne({ username: username });
+    const { email, password } = request.body;
+    const dbUser = await User.findOne({ email: email });
     if (!dbUser) {
       response.status(400).send("Invalid User");
     } else {
       const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
       if (isPasswordMatched) {
         const data = await User.findOne({
-          username: username,
+          email: email,
           password: dbUser.password,
         });
         if (data) {
-          const payload = { id: data._id, username: username };
+          const payload = { id: data._id, email: email };
           const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
           response.status(200).send({ success: true, message: jwtToken });
         } else {
