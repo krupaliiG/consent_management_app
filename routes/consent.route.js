@@ -1,3 +1,6 @@
+// import { validationSchema } from "../joiSchema";
+const validationSchema = require("../joiSchema/validationSchema");
+
 module.exports = (app) => {
   const consent = require("../controllers/apiController.js");
   const authentication = require("../middleware/auth.js");
@@ -5,7 +8,13 @@ module.exports = (app) => {
 
   app.get("/consents", authentication, consent.ListConsents);
 
-  app.post("/give-consent", authentication, validator, consent.GiveConsents);
+  app.post(
+    "/give-consent",
+    authentication,
+    validationSchema.addConsentSchema,
+    // validator,
+    consent.GiveConsents
+  );
 
   app.put("/:id", authentication, consent.updateConsent);
 

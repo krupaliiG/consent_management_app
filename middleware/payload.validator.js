@@ -1,23 +1,31 @@
-const joi = require("joi");
+// const Joi = require("joi");
 
-module.exports = async (request, response, next) => {
-  try {
-    // const { username, email } = request.data;
-    // const payload = { username, email };
+// module.exports = async (request, response, next) => {
+//   try {
+//     const schema = Joi.object({
+//       name: Joi.number().required(),
+//       email: Joi.string().required(),
+//       consentFor: Joi.string().required(),
+//     });
 
-    const validation = (request, response) =>
-      joi.object({
-        name: joi.string().alphanum().required(),
-        email: joi.string().email().required(),
-        consentFor: joi.string().alphanum().required(),
-      });
+//     const options = {
+//       abortEarly: false,
+//       allowUnknown: true,
+//       stripUnknown: true,
+//     };
 
-    const { error } = validation.validate(request.data);
-
-    // const data = validation.validate(payload);
-    console.log(data);
-    next();
-  } catch (err) {
-    response.status(400).send(err.message);
-  }
-};
+//     const { err, value } = schema.validate(request.body, options);
+//     console.log(value);
+//     if (err) {
+//       request.status(400).send({
+//         success: false,
+//         message: err.message,
+//       });
+//     } else {
+//       request.data = value;
+//       next();
+//     }
+//   } catch (err) {
+//     response.status(400).send(err.message);
+//   }
+// };
