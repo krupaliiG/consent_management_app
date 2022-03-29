@@ -4,7 +4,7 @@ const validationSchema = require("../joiSchema/validationSchema");
 module.exports = (app) => {
   const consent = require("../controllers/apiController.js");
   const authentication = require("../middleware/auth.js");
-  const validator = require("../middleware/payload.validator.js");
+  // const validator = require("../middleware/payload.validator.js");
 
   app.get("/consents", authentication, consent.ListConsents);
 
