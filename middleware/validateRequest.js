@@ -22,4 +22,4 @@ const validateRequest = (request, response, next, schema) => {
   }
 };
 
-module.exports = validateRequest;
+export default validateRequest;

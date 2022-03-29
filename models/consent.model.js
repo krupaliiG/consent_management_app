@@ -32,4 +32,6 @@ const ConsentSchema = mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Consent", ConsentSchema);
+// module.exports = mongoose.model("Consent", ConsentSchema);
+
+export default mongoose.model("Consent", ConsentSchema);

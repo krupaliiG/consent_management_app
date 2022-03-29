@@ -1,5 +1,6 @@
 const Joi = require("joi");
-const validateRequest = require("../middleware/validateRequest");
+// const validateRequest = require("../middleware/validateRequest");
+import { validateRequest } from "../middleware/validateRequest";
 
 function addConsentSchema(req, res, next) {
   const schema = Joi.object({
@@ -40,4 +41,6 @@ function loginUserSchema(req, res, next) {
   validateRequest(req, res, next, schema);
 }
 
-module.exports = { addConsentSchema, registerUserSchema, loginUserSchema };
+// module.exports = { addConsentSchema, registerUserSchema, loginUserSchema };
+
+export default { addConsentSchema, registerUserSchema, loginUserSchema };

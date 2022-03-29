@@ -1,4 +1,5 @@
-const validationSchema = require("../joiSchema/validationSchema");
+// const validationSchema = require("../joiSchema/validationSchema");
+import validationSchema from "../joiSchema/validationSchema";
 
 module.exports = (app) => {
   const consent = require("../controllers/apiController.js");
