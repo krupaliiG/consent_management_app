@@ -18,7 +18,7 @@ module.exports = async (request, response, next) => {
         const res = await User.findById(data.id);
 
         if (!res) throw new Error("Invalid Credentials!");
-        request.data = res;
+        request["data"] = res;
 
         next();
       }
@@ -26,7 +26,6 @@ module.exports = async (request, response, next) => {
       response.status(400).send("Authorization should be there!");
     }
   } catch (err) {
-    console.log("err::", err);
     response.status(401).send(err.message || err);
   }
 };

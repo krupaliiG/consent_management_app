@@ -1,9 +1,35 @@
 const Consent = require("../models/consent.model.js");
+
 const { ObjectId } = require("mongodb");
 
 exports.ListConsents = async (request, response) => {
   try {
-    const data = await Consent.find({});
+    const {
+      id = null,
+      name = "",
+      email = "",
+      page = 0,
+      limit = 0,
+    } = request.query;
+
+    let filterQuery = [];
+
+    if (id) {
+      filterQuery.push({ _id: id });
+    }
+    if (name) {
+      filterQuery.push({ name: name });
+    }
+    if (email) {
+      filterQuery.push({ email: email });
+    }
+
+    filterQuery = filterQuery.length ? { $or: filterQuery } : {};
+
+    const data = await Consent.find(filterQuery)
+      .skip(page * limit)
+      .limit(limit);
+
     response.status(200).send({ success: true, data: data });
   } catch (err) {
     response.status(400).send({ success: false, message: err.message });
@@ -13,7 +39,7 @@ exports.ListConsents = async (request, response) => {
 exports.GiveConsents = async (request, response) => {
   try {
     const { _id } = request.data;
-    console.log(_id);
+
     const consentDetail = request.body;
     const { name, email, consent_for } = consentDetail;
 
@@ -43,7 +69,7 @@ exports.updateConsent = async (request, response) => {
 
     const data = await Consent.findByIdAndUpdate(ObjectId(id), {
       updatedBy: _id,
-      ...updateData,
+      consentFor: updateData.consent_for,
     });
 
     response
