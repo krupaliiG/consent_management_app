@@ -9,7 +9,7 @@ const UserSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
-      validated(value) {
+      validate(value) {
         if (value.includes("@") === false)
           throw new Error("Email isn't valid.");
       },

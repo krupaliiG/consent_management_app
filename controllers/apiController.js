@@ -4,10 +4,6 @@ const { ObjectId } = require("mongodb");
 
 exports.ListConsents = async (request, response) => {
   try {
-    // const { name, email } = request.query;
-
-    // const data = await Consent.find({});
-    console.log("hhhhh");
     const {
       id = null,
       name = "",
@@ -18,7 +14,6 @@ exports.ListConsents = async (request, response) => {
 
     let filterQuery = [];
 
-    console.log(id, name, email, page, limit);
     if (id) {
       filterQuery.push({ _id: id });
     }
@@ -30,21 +25,10 @@ exports.ListConsents = async (request, response) => {
     }
 
     filterQuery = filterQuery.length ? { $or: filterQuery } : {};
-    console.log(filterQuery);
-
-    // {
-    //   $or: [{ _id: id }, { name: name }, { email: email }],
-    // }
 
     const data = await Consent.find(filterQuery)
       .skip(page * limit)
       .limit(limit);
-
-    // console.log(data);
-
-    // const data = await Consent.find()
-    // .skip(page * limit)
-    // .limit(limit);
 
     response.status(200).send({ success: true, data: data });
   } catch (err) {
@@ -54,7 +38,6 @@ exports.ListConsents = async (request, response) => {
 
 exports.GiveConsents = async (request, response) => {
   try {
-    console.log("in give");
     const { _id } = request.data;
 
     const consentDetail = request.body;
@@ -86,7 +69,7 @@ exports.updateConsent = async (request, response) => {
 
     const data = await Consent.findByIdAndUpdate(ObjectId(id), {
       updatedBy: _id,
-      ...updateData,
+      consentFor: updateData.consent_for,
     });
 
     response

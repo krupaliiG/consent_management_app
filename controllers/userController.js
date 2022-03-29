@@ -58,9 +58,8 @@ exports.LoginUser = async (request, response) => {
 
 exports.ChangePassword = async (request, response) => {
   try {
-    console.log(request.data);
     const { _id } = request.data;
-    console.log(_id);
+
     const updatedData = request.body;
 
     const data = await User.findByIdAndUpdate(_id, updatedData);
@@ -72,10 +71,44 @@ exports.ChangePassword = async (request, response) => {
   }
 };
 
+exports.Users = async (request, response) => {
+  try {
+    const {
+      id = null,
+      username = "",
+      email = "",
+      page = 0,
+      limit = 0,
+    } = request.query;
+
+    let filterQuery = [];
+
+    if (id) {
+      filterQuery.push({ _id: id });
+    }
+    if (username) {
+      filterQuery.push({ username: username });
+    }
+    if (email) {
+      filterQuery.push({ email: email });
+    }
+
+    filterQuery = filterQuery.length ? { $or: filterQuery } : {};
+
+    const data = await User.find(filterQuery)
+      .skip(page * limit)
+      .limit(limit);
+
+    response.status(200).send({ success: true, data: data });
+  } catch (err) {
+    response.status(400).send(err.message);
+  }
+};
+
 exports.UserDetail = async (request, response) => {
   try {
     const { _id } = request.data;
-    console.log(_id);
+    const { page = 0, limit = 1, name = "" } = request.query;
 
     const data = await User.aggregate([
       {
@@ -92,6 +125,8 @@ exports.UserDetail = async (request, response) => {
         },
       },
     ]);
+    // .skip(page * limit)
+    // .limit(limit);
 
     response.send(data);
   } catch (err) {

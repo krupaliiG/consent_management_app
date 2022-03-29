@@ -1,10 +1,8 @@
-// import { validationSchema } from "../joiSchema";
 const validationSchema = require("../joiSchema/validationSchema");
 
 module.exports = (app) => {
   const consent = require("../controllers/apiController.js");
   const authentication = require("../middleware/auth.js");
-  // const validator = require("../middleware/payload.validator.js");
 
   app.get("/consents", authentication, consent.ListConsents);
 
@@ -12,7 +10,6 @@ module.exports = (app) => {
     "/give-consent",
     authentication,
     validationSchema.addConsentSchema,
-    // validator,
     consent.GiveConsents
   );
 

@@ -1,5 +1,4 @@
 const Joi = require("joi");
-// import {validateRequest} from '../middleware'
 const validateRequest = require("../middleware/validateRequest");
 
 function addConsentSchema(req, res, next) {
@@ -14,8 +13,31 @@ function addConsentSchema(req, res, next) {
     consent_for: Joi.string().required(),
   }).unknown(true);
 
-  //   console.log("schema::", schema);
   validateRequest(req, res, next, schema);
 }
 
-module.exports = { addConsentSchema };
+function registerUserSchema(req, res, next) {
+  const schema = Joi.object({
+    username: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().required(),
+  }).unknown(true);
+
+  validateRequest(req, res, next, schema);
+}
+
+function loginUserSchema(req, res, next) {
+  const schema = Joi.object({
+    email: Joi.string().required().messages({
+      "string.base": `Name should be a type of string`,
+      "string.empty": `Name must contain value`,
+      "string.pattern.base": `Name must be enter in valid format`,
+      "any.required": `Name is a required field`,
+    }),
+    password: Joi.string().required(),
+  });
+
+  validateRequest(req, res, next, schema);
+}
+
+module.exports = { addConsentSchema, registerUserSchema, loginUserSchema };

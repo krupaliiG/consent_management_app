@@ -9,9 +9,10 @@ const ConsentSchema = mongoose.Schema(
     email: {
       type: String,
       required: true,
-      // validate(value) {
-      //     if (value.includes('@') === false) throw new Error("Email isn't Valid.");
-      //   }
+      validate(value) {
+        if (value.includes("@") === false)
+          throw new Error("Email isn't Valid.");
+      },
     },
     consentFor: {
       type: String,
