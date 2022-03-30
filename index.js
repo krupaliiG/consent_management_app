@@ -23,10 +23,11 @@ mongoose
     process.exit(1);
   });
 
-require("./routes/consent.route.js")(app);
-require("./routes/user.route.js")(app);
-// import { userRoute } from "./routes/consent.route.js";
-// app.use(userRoute);
+import { INTERNAL_LINKS } from "./constant";
+import { userRoute, consentRoute } from "./routes";
+
+app.use(INTERNAL_LINKS.USER.BASE_URL, userRoute);
+app.use(INTERNAL_LINKS.CONSENT.BASE_URL, consentRoute);
 
 app.listen(3000, () => {
   console.log("server just started at localhost:3000");

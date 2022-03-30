@@ -1,20 +1,21 @@
-// const validationSchema = require("../joiSchema/validationSchema");
-import validationSchema from "../joiSchema/validationSchema";
+import express from "express";
+import { authentication } from "../middleware";
+import consent from "../controllers/apiController";
+import { validationSchema } from "../joiSchema";
+import { INTERNAL_LINKS } from "../constant";
 
-module.exports = (app) => {
-  const consent = require("../controllers/apiController.js");
-  const authentication = require("../middleware/auth.js");
-
-  app.get("/consents", authentication, consent.ListConsents);
-
-  app.post(
-    "/give-consent",
+export default express
+  .Router()
+  .get(
+    INTERNAL_LINKS.CONSENT.LIST_CONSENT,
+    authentication,
+    consent.ListConsents
+  )
+  .post(
+    INTERNAL_LINKS.CONSENT.ADD_CONSENT,
     authentication,
     validationSchema.addConsentSchema,
     consent.GiveConsents
-  );
-
-  app.put("/:id", authentication, consent.updateConsent);
-
-  app.delete("/:id", authentication, consent.deleteConsent);
-};
+  )
+  .put("/:id", authentication, consent.updateConsent)
+  .delete("/:id", authentication, consent.deleteConsent);

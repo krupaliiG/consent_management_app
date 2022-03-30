@@ -1,16 +1,15 @@
-const User = require("../models/user.model.js");
-const Consent = require("../models/consent.model.js");
+import { userModel } from "../models";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 
-exports.RegisterUser = async (request, response) => {
+const RegisterUser = async (request, response) => {
   try {
     const userDetail = request.body;
     const { username, email, password } = userDetail;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data = new User({
+    const data = new userModel({
       username,
       email,
       password: hashedPassword,
@@ -25,16 +24,16 @@ exports.RegisterUser = async (request, response) => {
   }
 };
 
-exports.LoginUser = async (request, response) => {
+const LoginUser = async (request, response) => {
   try {
     const { email, password } = request.body;
-    const dbUser = await User.findOne({ email: email });
+    const dbUser = await userModel.findOne({ email: email });
     if (!dbUser) {
       response.status(400).send("Invalid User");
     } else {
       const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
       if (isPasswordMatched) {
-        const data = await User.findOne({
+        const data = await userModel.findOne({
           email: email,
           password: dbUser.password,
         });
@@ -56,13 +55,13 @@ exports.LoginUser = async (request, response) => {
   }
 };
 
-exports.ChangePassword = async (request, response) => {
+const ChangePassword = async (request, response) => {
   try {
     const { _id } = request.data;
 
     const updatedData = request.body;
 
-    const data = await User.findByIdAndUpdate(_id, updatedData);
+    const data = await userModel.findByIdAndUpdate(_id, updatedData);
     response
       .status(200)
       .send({ success: true, message: "Password changed successfully!" });
@@ -71,7 +70,7 @@ exports.ChangePassword = async (request, response) => {
   }
 };
 
-exports.Users = async (request, response) => {
+const Users = async (request, response) => {
   try {
     const {
       id = null,
@@ -95,7 +94,8 @@ exports.Users = async (request, response) => {
 
     filterQuery = filterQuery.length ? { $or: filterQuery } : {};
 
-    const data = await User.find(filterQuery)
+    const data = await userModel
+      .find(filterQuery)
       .skip(page * limit)
       .limit(limit);
 
@@ -105,12 +105,12 @@ exports.Users = async (request, response) => {
   }
 };
 
-exports.UserDetail = async (request, response) => {
+const UserDetail = async (request, response) => {
   try {
     const { _id } = request.data;
     const { page = 0, limit = 1, name = "" } = request.query;
 
-    const data = await User.aggregate([
+    const data = await userModel.aggregate([
       {
         $match: {
           _id: _id,
@@ -125,11 +125,16 @@ exports.UserDetail = async (request, response) => {
         },
       },
     ]);
-    // .skip(page * limit)
-    // .limit(limit);
-
     response.send(data);
   } catch (err) {
     response.status(401).send(err.message);
   }
+};
+
+export default {
+  RegisterUser,
+  LoginUser,
+  ChangePassword,
+  Users,
+  UserDetail,
 };

@@ -1,8 +1,8 @@
-const Consent = require("../models/consent.model.js");
+import { consentModel } from "../models";
 
 const { ObjectId } = require("mongodb");
 
-exports.ListConsents = async (request, response) => {
+const ListConsents = async (request, response) => {
   try {
     const {
       id = null,
@@ -26,7 +26,8 @@ exports.ListConsents = async (request, response) => {
 
     filterQuery = filterQuery.length ? { $or: filterQuery } : {};
 
-    const data = await Consent.find(filterQuery)
+    const data = await consentModel
+      .find(filterQuery)
       .skip(page * limit)
       .limit(limit);
 
@@ -36,14 +37,14 @@ exports.ListConsents = async (request, response) => {
   }
 };
 
-exports.GiveConsents = async (request, response) => {
+const GiveConsents = async (request, response) => {
   try {
     const { _id } = request.data;
 
     const consentDetail = request.body;
     const { name, email, consent_for } = consentDetail;
 
-    const data = new Consent({
+    const data = new consentModel({
       name,
       email,
       consentFor: consent_for,
@@ -60,14 +61,14 @@ exports.GiveConsents = async (request, response) => {
   }
 };
 
-exports.updateConsent = async (request, response) => {
+const updateConsent = async (request, response) => {
   try {
     const { _id } = request.data;
 
     const id = request.params;
     const updateData = request.body;
 
-    const data = await Consent.findByIdAndUpdate(ObjectId(id), {
+    const data = await consentModel.findByIdAndUpdate(ObjectId(id), {
       updatedBy: _id,
       consentFor: updateData.consent_for,
     });
@@ -80,10 +81,10 @@ exports.updateConsent = async (request, response) => {
   }
 };
 
-exports.deleteConsent = async (request, response) => {
+const deleteConsent = async (request, response) => {
   try {
     const id = request.params;
-    const data = await Consent.findByIdAndDelete(ObjectId(id));
+    const data = await consentModel.findByIdAndDelete(ObjectId(id));
     response
       .status(200)
       .send({ success: true, message: "Consent deleted Successfullly!" });
@@ -91,3 +92,5 @@ exports.deleteConsent = async (request, response) => {
     response.status(400).send({ success: false, message: err.message });
   }
 };
+
+export default { ListConsents, GiveConsents, updateConsent, deleteConsent };
