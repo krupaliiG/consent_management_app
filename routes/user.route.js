@@ -1,12 +1,17 @@
-const validationSchema = require("../joiSchema/validationSchema");
+import express from "express";
+import { INTERNAL_LINKS } from "../constant";
+import { userController } from "../controllers";
+import { validationSchema } from "../joiSchema";
 
-module.exports = (app) => {
-  const user = require("../controllers/userController.js");
-  const authentication = require("../middleware/auth.js");
-
-  app.post("/users", validationSchema.registerUserSchema, user.RegisterUser);
-  app.post("/login", validationSchema.loginUserSchema, user.LoginUser);
-  app.post("/change-password", authentication, user.ChangePassword);
-  app.get("/users", authentication, user.Users);
-  app.get("/userdetail", authentication, user.UserDetail);
-};
+export default express
+  .Router()
+  .post(
+    INTERNAL_LINKS.USER.SIGNUP,
+    validationSchema.registerUserSchema,
+    userController.RegisterUser
+  )
+  .post(
+    INTERNAL_LINKS.USER.LOGIN,
+    validationSchema.loginUserSchema,
+    userController.LoginUser
+  );

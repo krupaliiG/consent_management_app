@@ -1,9 +1,12 @@
-const express = require("express");
+// const express = require("express");
+import express from "express";
 const app = express();
 app.use(express.json());
 
-const dbConfig = require("./config/dbConfig.js");
-const mongoose = require("mongoose");
+// const dbConfig = require("./config/dbConfig.js");
+import dbConfig from "./config/dbConfig.js";
+// const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 mongoose.Promise = global.Promise;
 
@@ -20,8 +23,11 @@ mongoose
     process.exit(1);
   });
 
-require("./routes/consent.route.js")(app);
-require("./routes/user.route.js")(app);
+import { INTERNAL_LINKS } from "./constant";
+import { userRoute, consentRoute } from "./routes";
+
+app.use(INTERNAL_LINKS.USER.BASE_URL, userRoute);
+app.use(INTERNAL_LINKS.CONSENT.BASE_URL, consentRoute);
 
 app.listen(3000, () => {
   console.log("server just started at localhost:3000");
