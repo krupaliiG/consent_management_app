@@ -1,11 +1,8 @@
-// const express = require("express");
 import express from "express";
 const app = express();
 app.use(express.json());
 
-// const dbConfig = require("./config/dbConfig.js");
 import dbConfig from "./config/dbConfig.js";
-// const mongoose = require("mongoose");
 import mongoose from "mongoose";
 
 mongoose.Promise = global.Promise;

@@ -5,11 +5,17 @@ export default {
     BASE_URL: "/api/v1/users",
     SIGNUP: "/signup",
     LOGIN: "/login",
+    CHANGE_PASSWORD: "/change-password",
+    USER_DETAIL: "/userdetail",
+    USERS: "/",
   },
 
   CONSENT: {
     BASE_URL: "/api/v1/consent",
     LIST_CONSENT: "/",
+    GROUP_CONSENT: "/bydate",
     ADD_CONSENT: "/add",
+    UPDATE_CONSENT: "/:id",
+    DELETE_CONSENT: "/:id",
   },
 };

@@ -2,7 +2,8 @@ const Joi = require("joi");
 
 import { validateRequest } from "../middleware";
 
-function addConsentSchema(req, res, next) {
+function addConsentSchema(request, response, next) {
+  console.log("from schema", request.data);
   const schema = Joi.object({
     name: Joi.string()
       .regex(/^[a-zA-Z0-9][a-zA-Z0-9.,$;\-/|()\[\]{} ]+$/)
@@ -14,20 +15,20 @@ function addConsentSchema(req, res, next) {
     consent_for: Joi.string().required(),
   }).unknown(true);
 
-  validateRequest(req, res, next, schema);
+  validateRequest(request, response, next, schema);
 }
 
-function registerUserSchema(req, res, next) {
+function registerUserSchema(request, response, next) {
   const schema = Joi.object({
     username: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.string().required(),
   }).unknown(true);
 
-  validateRequest(req, res, next, schema);
+  validateRequest(request, response, next, schema);
 }
 
-function loginUserSchema(req, res, next) {
+function loginUserSchema(request, response, next) {
   const schema = Joi.object({
     email: Joi.string().required().messages({
       "string.base": `Name should be a type of string`,
@@ -38,7 +39,7 @@ function loginUserSchema(req, res, next) {
     password: Joi.string().required(),
   });
 
-  validateRequest(req, res, next, schema);
+  validateRequest(request, response, next, schema);
 }
 
 export default { addConsentSchema, registerUserSchema, loginUserSchema };

@@ -18,8 +18,8 @@ const authentication = async (request, response, next) => {
         const res = await userModel.findById(data.id);
 
         if (!res) throw new Error("Invalid Credentials!");
-        request["data"] = res;
 
+        request["data"] = res;
         next();
       }
     } else {
