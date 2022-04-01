@@ -1,6 +1,8 @@
 import express from "express";
+import allRoutes from "./routes/all.route";
 const app = express();
-app.use(express.json());
+import bodyParser from "body-parser";
+// import { morgan } from "morgan";
 
 import dbConfig from "./config/dbConfig.js";
 import mongoose from "mongoose";
@@ -20,11 +22,17 @@ mongoose
     process.exit(1);
   });
 
-import { INTERNAL_LINKS } from "./constant";
-import { userRoute, consentRoute } from "./routes";
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: "50mb",
+    parameterLimit: 1000000,
+  })
+);
+app.use(bodyParser.json({ limit: "50mb" }));
 
-app.use(INTERNAL_LINKS.USER.BASE_URL, userRoute);
-app.use(INTERNAL_LINKS.CONSENT.BASE_URL, consentRoute);
+allRoutes(app);
+// app.use(morgan("dev"));
 
 app.listen(3000, () => {
   console.log("server just started at localhost:3000");

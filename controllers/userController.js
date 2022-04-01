@@ -2,6 +2,7 @@ import { userModel } from "../models";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
+import { errorLogger } from "../utils";
 
 const RegisterUser = async (request, response) => {
   try {
@@ -29,7 +30,7 @@ const LoginUser = async (request, response) => {
     const { email, password } = request.body;
     const dbUser = await userModel.findOne({ email: email });
     if (!dbUser) {
-      response.status(400).send("Invalid User");
+      response.status(400).send({ success: false, message: "Invalid User" });
     } else {
       const isPasswordMatched = await bcrypt.compare(password, dbUser.password);
       if (isPasswordMatched) {
@@ -51,6 +52,8 @@ const LoginUser = async (request, response) => {
       }
     }
   } catch (err) {
+    console.log(err);
+    errorLogger(err.message || err, request.originalUrl);
     response.status(400).send({ success: false, message: err.message });
   }
 };

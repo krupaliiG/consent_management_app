@@ -1,5 +1,6 @@
 import { consentModel } from "../models";
 import { response, request } from "express";
+import { errorLogger } from "../utils";
 
 const { ObjectId } = require("mongodb");
 
@@ -34,6 +35,8 @@ const ListConsents = async (request, response) => {
 
     response.status(200).send({ success: true, data: data });
   } catch (err) {
+    console.log(err);
+    errorLogger(err.message || err, request.originalUrl);
     response.status(400).send({ success: false, message: err.message });
   }
 };

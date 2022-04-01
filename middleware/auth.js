@@ -10,23 +10,29 @@ const authentication = async (request, response, next) => {
     if (authHeader !== undefined) {
       jwtToken = authHeader.split(" ")[1];
       if (jwtToken === undefined) {
-        response.status(401).send("Invalid Token");
+        response.status(401).send({ success: false, message: "Invalid Token" });
       } else {
         const data = jwt.verify(jwtToken, "MY_SECRET_TOKEN");
-        if (!data) response.status(401).send("Invalid Credentials!");
+        if (!data)
+          response
+            .status(401)
+            .send({ success: false, message: "Invalid Credentials!" });
 
         const res = await userModel.findById(data.id);
 
-        if (!res) throw new Error("Invalid Credentials!");
+        if (!res)
+          throw new Error({ success: false, message: "Invalid Credentials!" });
 
         request["data"] = res;
         next();
       }
     } else {
-      response.status(400).send("Authorization should be there!");
+      response
+        .status(400)
+        .send({ success: false, message: "Authorization should be there!" });
     }
   } catch (err) {
-    response.status(401).send(err.message || err);
+    response.status(401).send({ success: false, message: err.message });
   }
 };
 
