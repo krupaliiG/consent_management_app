@@ -14,7 +14,7 @@ const validateRequest = (request, response, next, schema) => {
         message: err,
       });
     } else {
-      request.data = value;
+      request.body = value;
       next();
     }
   } catch (err) {

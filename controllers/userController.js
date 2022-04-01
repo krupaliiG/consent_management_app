@@ -72,34 +72,27 @@ const ChangePassword = async (request, response) => {
 
 const Users = async (request, response) => {
   try {
-    const {
-      id = null,
-      username = "",
-      email = "",
-      page = 0,
-      limit = 0,
-    } = request.query;
+    const data = await userModel.aggregate([
+      {
+        $lookup: {
+          from: "consents",
+          localField: "_id",
+          foreignField: "createdBy",
+          as: "consentGivenByUser",
+        },
+      },
+      {
+        $addFields: {
+          totalConsents: { $size: { $ifNull: ["$consentGivenByUser", []] } },
+        },
+      },
+    ]);
 
-    let filterQuery = [];
+    const totalCount = await userModel.countDocuments();
 
-    if (id) {
-      filterQuery.push({ _id: id });
-    }
-    if (username) {
-      filterQuery.push({ username: username });
-    }
-    if (email) {
-      filterQuery.push({ email: email });
-    }
-
-    filterQuery = filterQuery.length ? { $or: filterQuery } : {};
-
-    const data = await userModel
-      .find(filterQuery)
-      .skip(page * limit)
-      .limit(limit);
-
-    response.status(200).send({ success: true, data: data });
+    response
+      .status(200)
+      .send({ success: true, totalUser: totalCount, data: data });
   } catch (err) {
     response.status(400).send(err.message);
   }

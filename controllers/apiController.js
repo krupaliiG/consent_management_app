@@ -1,4 +1,5 @@
 import { consentModel } from "../models";
+import { response, request } from "express";
 
 const { ObjectId } = require("mongodb");
 
@@ -40,7 +41,6 @@ const ListConsents = async (request, response) => {
 const GiveConsents = async (request, response) => {
   try {
     const { _id } = request.data;
-
     const consentDetail = request.body;
     const { name, email, consent_for } = consentDetail;
 
@@ -58,6 +58,48 @@ const GiveConsents = async (request, response) => {
       .send({ success: true, message: "Consent added Successfullly!" });
   } catch (err) {
     response.status(400).send({ success: false, message: err.message });
+  }
+};
+
+const GroupConsents = async (request, response) => {
+  try {
+    const data = await consentModel.aggregate([
+      {
+        $project: {
+          date: {
+            $dayOfMonth: "$createdAt",
+          },
+          name: 1,
+          consentFor: 1,
+        },
+      },
+      {
+        $unwind: "$date",
+      },
+      {
+        $group: {
+          _id: "$date",
+          consents: {
+            $push: {
+              name: "$name",
+              email: "$email",
+              consentFor: "$consentFor",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          Date: "$_id",
+          consents: "$consents",
+        },
+      },
+    ]);
+
+    response.send(data);
+  } catch (err) {
+    response.status(400).send(err.message);
   }
 };
 
@@ -93,4 +135,10 @@ const deleteConsent = async (request, response) => {
   }
 };
 
-export default { ListConsents, GiveConsents, updateConsent, deleteConsent };
+export default {
+  ListConsents,
+  GroupConsents,
+  GiveConsents,
+  updateConsent,
+  deleteConsent,
+};

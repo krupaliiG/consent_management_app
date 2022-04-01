@@ -17,5 +17,18 @@ export default express
     validationSchema.addConsentSchema,
     consent.GiveConsents
   )
-  .put("/:id", authentication, consent.updateConsent)
-  .delete("/:id", authentication, consent.deleteConsent);
+  .get(
+    INTERNAL_LINKS.CONSENT.GROUP_CONSENT,
+    authentication,
+    consent.GroupConsents
+  )
+  .put(
+    INTERNAL_LINKS.CONSENT.UPDATE_CONSENT,
+    authentication,
+    consent.updateConsent
+  )
+  .delete(
+    INTERNAL_LINKS.CONSENT.DELETE_CONSENT,
+    authentication,
+    consent.deleteConsent
+  );

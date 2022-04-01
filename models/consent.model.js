@@ -29,9 +29,8 @@ const ConsentSchema = mongoose.Schema(
   },
   {
     versionKey: false,
+    timestamps: true,
   }
 );
-
-// module.exports = mongoose.model("Consent", ConsentSchema);
 
 export default mongoose.model("Consent", ConsentSchema);
