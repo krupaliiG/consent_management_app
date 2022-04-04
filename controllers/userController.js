@@ -20,8 +20,9 @@ const RegisterUser = async (request, response) => {
     response
       .status(200)
       .send({ success: true, message: "Registration Successfull!" });
-  } catch (err) {
-    response.status(400).send({ success: false, message: err.message });
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
   }
 };
 
@@ -48,13 +49,14 @@ const LoginUser = async (request, response) => {
             .send({ success: false, message: "Invalid Credentials!" });
         }
       } else {
-        response.status(400).send("Invalid Password!");
+        response
+          .status(400)
+          .send({ success: false, message: "Invalid Password!" });
       }
     }
-  } catch (err) {
-    console.log(err);
-    errorLogger(err.message || err, request.originalUrl);
-    response.status(400).send({ success: false, message: err.message });
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
   }
 };
 
@@ -68,8 +70,9 @@ const ChangePassword = async (request, response) => {
     response
       .status(200)
       .send({ success: true, message: "Password changed successfully!" });
-  } catch (err) {
-    response.status(400).send({ success: false, message: err.message });
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
   }
 };
 
@@ -96,8 +99,9 @@ const Users = async (request, response) => {
     response
       .status(200)
       .send({ success: true, totalUser: totalCount, data: data });
-  } catch (err) {
-    response.status(400).send(err.message);
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
   }
 };
 
@@ -121,9 +125,10 @@ const UserDetail = async (request, response) => {
         },
       },
     ]);
-    response.send(data);
-  } catch (err) {
-    response.status(401).send(err.message);
+    response.send({ success: true, message: data });
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(401).send({ success: false, message: error.message });
   }
 };
 

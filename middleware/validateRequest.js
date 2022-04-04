@@ -1,24 +1,25 @@
 const validateRequest = (request, response, next, schema) => {
   try {
+    console.log(request.data);
     const options = {
       abortEarly: false,
       allowUnknown: true,
       stripUnknown: true,
     };
 
-    const { err, value } = schema.validate(request.body, options);
+    const { error, value } = schema.validate(request.body, options);
 
-    if (err) {
+    if (error) {
       response.status(400).send({
         success: false,
-        message: err,
+        message: error,
       });
     } else {
       request.body = value;
       next();
     }
-  } catch (err) {
-    response.status(400).send(err.message);
+  } catch (error) {
+    response.status(400).send({ success: false, message: error.message });
   }
 };
 

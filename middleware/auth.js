@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 import { userModel } from "../models";
+import { errorLogger } from "../utils";
 const { ObjectId } = require("mongodb");
 
 const authentication = async (request, response, next) => {
@@ -31,8 +32,9 @@ const authentication = async (request, response, next) => {
         .status(400)
         .send({ success: false, message: "Authorization should be there!" });
     }
-  } catch (err) {
-    response.status(401).send({ success: false, message: err.message });
+  } catch (error) {
+    errorLogger(error.message || error, request.originalUrl);
+    response.status(401).send({ success: false, message: error.message });
   }
 };
 
