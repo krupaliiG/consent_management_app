@@ -2,6 +2,10 @@ import express from "express";
 import allRoutes from "./routes/all.route";
 const app = express();
 import bodyParser from "body-parser";
+import { INTERNAL_LINKS } from "./constant";
+
+require("dotenv").config({ path: ".env" });
+
 // import { morgan } from "morgan";
 
 import dbConfig from "./config/dbConfig.js";
@@ -34,6 +38,10 @@ app.use(bodyParser.json({ limit: "50mb" }));
 allRoutes(app);
 // app.use(morgan("dev"));
 
-app.listen(3000, () => {
-  console.log("server just started at localhost:3000");
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 3000;
+const BASE_API_URL = INTERNAL_LINKS.BASE_API_URL;
+
+app.listen(PORT, () => {
+  console.log(`server just started at http://${HOST}:${PORT}${BASE_API_URL}`);
 });
