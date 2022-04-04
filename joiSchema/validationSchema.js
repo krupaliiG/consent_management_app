@@ -3,7 +3,6 @@ const Joi = require("joi");
 import { validateRequest } from "../middleware";
 
 function addConsentSchema(request, response, next) {
-  console.log("from schema", request.data);
   const schema = Joi.object({
     name: Joi.string()
       .regex(/^[a-zA-Z0-9][a-zA-Z0-9.,$;\-/|()\[\]{} ]+$/)
