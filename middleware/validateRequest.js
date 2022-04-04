@@ -1,6 +1,5 @@
 const validateRequest = (request, response, next, schema) => {
   try {
-    console.log(request.data);
     const options = {
       abortEarly: false,
       allowUnknown: true,

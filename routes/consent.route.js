@@ -31,4 +31,5 @@ export default express
     INTERNAL_LINKS.CONSENT.DELETE_CONSENT,
     authentication,
     consent.deleteConsent
-  );
+  )
+  .post(INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT, consent.FromFileData);

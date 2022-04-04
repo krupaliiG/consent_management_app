@@ -1,8 +1,11 @@
 import express from "express";
+const fileUpload = require("express-fileupload");
 import allRoutes from "./routes/all.route";
 const app = express();
 import bodyParser from "body-parser";
 import { INTERNAL_LINKS } from "./constant";
+
+app.use(fileUpload());
 
 require("dotenv").config({ path: ".env" });
 

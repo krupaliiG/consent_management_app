@@ -1,6 +1,7 @@
 import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
+const multer = require("multer");
 
 const { ObjectId } = require("mongodb");
 
@@ -45,7 +46,7 @@ const GiveConsents = async (request, response) => {
   try {
     infoLogger(request.body, request.originalUrl);
     const { _id } = request.data;
-    console.log("from giveconsent api", request.body);
+
     const consentDetail = request.body;
     infoLogger(request.query, request.originalUrl);
     const { name, email, consent_for } = consentDetail;
@@ -63,7 +64,6 @@ const GiveConsents = async (request, response) => {
       .status(200)
       .send({ success: true, message: "Consent added Successfullly!" });
   } catch (error) {
-    // console.log(request.data);
     errorLogger(error.message || error, request.originalUrl);
     response.status(400).send({ success: false, message: error.message });
   }
@@ -148,10 +148,22 @@ const deleteConsent = async (request, response) => {
   }
 };
 
+const FromFileData = async (request, response) => {
+  try {
+    const { filedata } = request.files;
+    const { data } = filedata;
+    const result = await data.toString();
+    response.status(200).send({ success: true, data: result });
+  } catch (error) {
+    response.send({ success: false, message: error.message });
+  }
+};
+
 export default {
   ListConsents,
   GroupConsents,
   GiveConsents,
   updateConsent,
   deleteConsent,
+  FromFileData,
 };

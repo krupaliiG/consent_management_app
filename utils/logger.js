@@ -1,9 +1,7 @@
 import winston from "winston";
-// const todayDate = new Date();
+
 const LOGS_PATH = "logs";
 const todayDate = new Date().toDateString();
-
-// console.log("from logger file");
 
 const logger = {
   errorLog: winston.createLogger({
