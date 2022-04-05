@@ -32,4 +32,5 @@ export default express
     authentication,
     consent.deleteConsent
   )
-  .post(INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT, consent.FromFileData);
+  .post(INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT, consent.FromFileData)
+  .get(INTERNAL_LINKS.CONSENT.GENERATE_CSV, consent.generateCSV);

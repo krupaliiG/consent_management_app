@@ -18,5 +18,6 @@ export default {
     UPDATE_CONSENT: "/:id",
     DELETE_CONSENT: "/:id",
     FROM_FILE_CONSENT: "/fromfile",
+    GENERATE_CSV: "/generatecsv",
   },
 };

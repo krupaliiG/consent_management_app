@@ -2,6 +2,7 @@ import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
 import { emit } from "nodemon";
+import dataGenerator from "dummy-data-generator";
 const multer = require("multer");
 const csv = require("csv-parser");
 const fs = require("fs");
@@ -221,6 +222,64 @@ const FromFileData = async (request, response) => {
   }
 };
 
+const generateCSV = async (request, response) => {
+  try {
+    const columnData = {
+      name: {
+        type: "word",
+        length: 10,
+      },
+      email: {
+        type: "email",
+        length: 20,
+      },
+      consentFor: {
+        type: "paragraph",
+        length: 10,
+      },
+    };
+
+    const randomData = dataGenerator({
+      columnData,
+      count: 5,
+      isCSV: true,
+    });
+
+    console.log(randomData);
+    const res = randomData.split("\r\n");
+    const headers = res[0].split(",");
+    console.log(headers);
+    console.log(res);
+
+    const jsonData = [];
+    JSON.stringify(res);
+    console.log(res);
+    for (let i = 1; i < res.length; i++) {
+      let data = res[i].split(",");
+
+      console.log("data::", data);
+      const obj = {};
+      for (let j = 0; j < headers.length; j++) {
+        obj[headers[j]] = JSON.parse(data[j]);
+      }
+      console.log("obj:::", obj);
+      jsonData.push(obj);
+    }
+
+    JSON.stringify(jsonData);
+    console.log(jsonData);
+    await consentModel.insertMany(jsonData);
+
+    response
+      .status(200)
+      .send({ success: true, message: "Data added successfully!" });
+  } catch (error) {
+    response
+      .status(400)
+      .send({ success: true, message: error.message || message });
+  }
+};
+
 export default {
   ListConsents,
   GroupConsents,
@@ -228,4 +287,5 @@ export default {
   updateConsent,
   deleteConsent,
   FromFileData,
+  generateCSV,
 };
