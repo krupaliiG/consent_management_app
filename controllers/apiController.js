@@ -1,7 +1,10 @@
 import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
+import { emit } from "nodemon";
 const multer = require("multer");
+const csv = require("csv-parser");
+const fs = require("fs");
 
 const { ObjectId } = require("mongodb");
 
@@ -51,18 +54,28 @@ const GiveConsents = async (request, response) => {
     infoLogger(request.query, request.originalUrl);
     const { name, email, consent_for } = consentDetail;
 
-    const data = new consentModel({
-      name,
-      email,
-      consentFor: consent_for,
-      createdBy: _id,
-      updatedBy: _id,
-    });
+    const validateEmail = await consentModel.find({ email: email });
+    console.log(validateEmail);
 
-    await data.save();
-    response
-      .status(200)
-      .send({ success: true, message: "Consent added Successfullly!" });
+    if (validateEmail.length !== 0) {
+      response
+        .status(200)
+        .send({ success: true, message: "Email Already exists!" });
+    } else {
+      const data = new consentModel({
+        name,
+        email,
+        consentFor: consent_for,
+        createdBy: _id,
+        updatedBy: _id,
+      });
+
+      await data.save();
+
+      response
+        .status(200)
+        .send({ success: true, message: "Consent added Successfullly!" });
+    }
   } catch (error) {
     errorLogger(error.message || error, request.originalUrl);
     response.status(400).send({ success: false, message: error.message });
@@ -151,9 +164,58 @@ const deleteConsent = async (request, response) => {
 const FromFileData = async (request, response) => {
   try {
     const { filedata } = request.files;
-    const { data } = filedata;
+    const { data, name } = filedata;
     const result = await data.toString();
-    response.status(200).send({ success: true, data: result });
+    const resArray = result.split("\n");
+    const count = resArray.length - 1;
+
+    let jsonObj = [];
+    let headers = resArray[0].split(",");
+
+    for (let i = 1; i < resArray.length; i++) {
+      let data = resArray[i].split(",");
+      // console.log(data);
+      if (headers.length === data.length) {
+        let obj = {};
+        for (let j = 0; j < data.length; j++) {
+          obj[headers[j].trim()] = data[j].trim();
+        }
+        jsonObj.push(obj);
+      }
+    }
+    JSON.stringify(jsonObj);
+    const validatedData = [];
+    for (let record of jsonObj) {
+      // console.log(record.email);
+      const data = await consentModel.find({ email: record.email });
+      console.log(data);
+      if (data.length === 0) {
+        validatedData.push(record);
+      }
+    }
+    console.log(validatedData);
+    await consentModel.insertMany(validatedData);
+
+    // for (let i = 1; i <= count - 1; i++) {
+    //   const data = resArray[i].split(",");
+    //   if (data !== undefined) {
+    //     const name = data[0];
+    //     const email = data[1];
+    //     const consentFor = data[2];
+    //     // console.log(name, email);
+    //     const object = new consentModel({
+    //       name,
+    //       email,
+    //       consentFor,
+    //     });
+
+    //     await object.save();
+    //   }
+    // }
+
+    response
+      .status(200)
+      .send({ success: true, data: "Data Added successfully!" });
   } catch (error) {
     response.send({ success: false, message: error.message });
   }
