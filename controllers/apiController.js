@@ -4,7 +4,8 @@ import { errorLogger, infoLogger } from "../utils";
 import { emit } from "nodemon";
 import dataGenerator from "dummy-data-generator";
 import { type } from "os";
-const multer = require("multer");
+import { upload } from "../middleware";
+
 const csv = require("csv-parser");
 const fs = require("fs");
 
@@ -253,6 +254,16 @@ const generateCSV = async (request, response) => {
   }
 };
 
+const uploadImage = async (request, response) => {
+  try {
+    response
+      .status(200)
+      .send({ success: true, message: "File uploaded successfully!" });
+  } catch (error) {
+    response.status(400).send({ success: false, message: error.message });
+  }
+};
+
 export default {
   ListConsents,
   GroupConsents,
@@ -261,4 +272,5 @@ export default {
   deleteConsent,
   FromFileData,
   generateCSV,
+  uploadImage,
 };

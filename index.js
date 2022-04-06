@@ -1,11 +1,11 @@
 import express from "express";
-const fileUpload = require("express-fileupload");
+// const fileUpload = require("express-fileupload");
 import allRoutes from "./routes/all.route";
 const app = express();
 import bodyParser from "body-parser";
 import { INTERNAL_LINKS } from "./constant";
 
-app.use(fileUpload());
+// app.use(fileUpload());
 
 require("dotenv").config({ path: ".env" });
 
@@ -34,6 +34,7 @@ app.use(
     parameterLimit: 1000000,
   })
 );
+
 app.use(bodyParser.json({ limit: "50mb" }));
 
 allRoutes(app);
