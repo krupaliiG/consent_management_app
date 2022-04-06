@@ -17,5 +17,7 @@ export default {
     ADD_CONSENT: "/add",
     UPDATE_CONSENT: "/:id",
     DELETE_CONSENT: "/:id",
+    FROM_FILE_CONSENT: "/fromfile",
+    GENERATE_CSV: "/generatecsv",
   },
 };

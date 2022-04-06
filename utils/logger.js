@@ -1,9 +1,7 @@
 import winston from "winston";
-// const todayDate = new Date();
+
 const LOGS_PATH = "logs";
 const todayDate = new Date().toDateString();
-
-// console.log("from logger file");
 
 const logger = {
   errorLog: winston.createLogger({
@@ -11,7 +9,7 @@ const logger = {
     format: winston.format.json(),
     transports: [
       new winston.transports.File({
-        filename: `${LOGS_PATH}/${todayDate}_error.log`, //logs/date_error.log
+        filename: `${LOGS_PATH}/${todayDate}_error.log`,
       }),
     ],
   }),

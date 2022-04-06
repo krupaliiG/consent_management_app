@@ -1,12 +1,13 @@
 import express from "express";
+const fileUpload = require("express-fileupload");
 import allRoutes from "./routes/all.route";
 const app = express();
 import bodyParser from "body-parser";
 import { INTERNAL_LINKS } from "./constant";
 
-require("dotenv").config({ path: ".env" });
+app.use(fileUpload());
 
-// import { morgan } from "morgan";
+require("dotenv").config({ path: ".env" });
 
 import dbConfig from "./config/dbConfig.js";
 import mongoose from "mongoose";
@@ -36,7 +37,6 @@ app.use(
 app.use(bodyParser.json({ limit: "50mb" }));
 
 allRoutes(app);
-// app.use(morgan("dev"));
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;

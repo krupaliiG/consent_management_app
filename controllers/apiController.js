@@ -1,6 +1,12 @@
 import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
+import { emit } from "nodemon";
+import dataGenerator from "dummy-data-generator";
+import { type } from "os";
+const multer = require("multer");
+const csv = require("csv-parser");
+const fs = require("fs");
 
 const { ObjectId } = require("mongodb");
 
@@ -45,25 +51,33 @@ const GiveConsents = async (request, response) => {
   try {
     infoLogger(request.body, request.originalUrl);
     const { _id } = request.data;
-    console.log("from giveconsent api", request.body);
+
     const consentDetail = request.body;
     infoLogger(request.query, request.originalUrl);
     const { name, email, consent_for } = consentDetail;
 
-    const data = new consentModel({
-      name,
-      email,
-      consentFor: consent_for,
-      createdBy: _id,
-      updatedBy: _id,
-    });
+    const validateEmail = await consentModel.find({ email: email });
 
-    await data.save();
-    response
-      .status(200)
-      .send({ success: true, message: "Consent added Successfullly!" });
+    if (validateEmail.length !== 0) {
+      response
+        .status(200)
+        .send({ success: true, message: "Email Already exists!" });
+    } else {
+      const data = new consentModel({
+        name,
+        email,
+        consentFor: consent_for,
+        createdBy: _id,
+        updatedBy: _id,
+      });
+
+      await data.save();
+
+      response
+        .status(200)
+        .send({ success: true, message: "Consent added Successfullly!" });
+    }
   } catch (error) {
-    // console.log(request.data);
     errorLogger(error.message || error, request.originalUrl);
     response.status(400).send({ success: false, message: error.message });
   }
@@ -148,10 +162,103 @@ const deleteConsent = async (request, response) => {
   }
 };
 
+const convertIntoJson = (resArray, FromFileData) => {
+  let jsonData = [];
+  let headers = resArray[0].split(",");
+
+  for (let i = 1; i < resArray.length; i++) {
+    let data = resArray[i].split(",");
+
+    if (headers.length === data.length) {
+      let obj = {};
+      for (let j = 0; j < data.length; j++) {
+        const value = FromFileData
+          ? data[j].trim()
+          : JSON.parse(data[j].trim());
+
+        obj[headers[j].trim()] = value;
+      }
+
+      jsonData.push(obj);
+    }
+  }
+  JSON.stringify(jsonData);
+  return jsonData;
+};
+
+const FromFileData = async (request, response) => {
+  try {
+    const { filedata } = request.files;
+    const { data, name } = filedata;
+    const result = await data.toString();
+    const resArray = result.split("\n");
+
+    const jsonData = convertIntoJson(resArray, true);
+
+    const validatedData = [];
+    for (let record of jsonData) {
+      const data = await consentModel.find({ email: record.email });
+
+      if (data.length === 0) {
+        validatedData.push(record);
+      }
+    }
+
+    await consentModel.insertMany(validatedData);
+
+    response
+      .status(200)
+      .send({ success: true, data: "Data Added successfully!" });
+  } catch (error) {
+    response.send({ success: false, message: error.message });
+  }
+};
+
+const generateCSV = async (request, response) => {
+  try {
+    const columnData = {
+      name: {
+        type: "word",
+        length: 10,
+      },
+      email: {
+        type: "email",
+        length: 20,
+      },
+      consentFor: {
+        type: "paragraph",
+        length: 10,
+      },
+    };
+
+    const randomData = dataGenerator({
+      columnData,
+      count: 1,
+      isCSV: true,
+    });
+
+    const resArray = randomData.split("\r\n");
+
+    const jsonData = convertIntoJson(resArray);
+
+    await consentModel.insertMany(jsonData);
+
+    response
+      .status(200)
+      .send({ success: true, message: "Data added successfully!" });
+  } catch (error) {
+    response
+      .status(400)
+      .send({ success: true, message: error.message || message });
+  }
+};
+
 export default {
   ListConsents,
   GroupConsents,
   GiveConsents,
   updateConsent,
   deleteConsent,
+  FromFileData,
+  generateCSV,
 };

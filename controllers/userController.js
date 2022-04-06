@@ -30,6 +30,7 @@ const LoginUser = async (request, response) => {
   try {
     const { email, password } = request.body;
     const dbUser = await userModel.findOne({ email: email });
+
     if (!dbUser) {
       response.status(400).send({ success: false, message: "Invalid User" });
     } else {
