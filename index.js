@@ -9,8 +9,6 @@ app.use(fileUpload());
 
 require("dotenv").config({ path: ".env" });
 
-// import { morgan } from "morgan";
-
 import dbConfig from "./config/dbConfig.js";
 import mongoose from "mongoose";
 
@@ -39,7 +37,6 @@ app.use(
 app.use(bodyParser.json({ limit: "50mb" }));
 
 allRoutes(app);
-// app.use(morgan("dev"));
 
 const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;

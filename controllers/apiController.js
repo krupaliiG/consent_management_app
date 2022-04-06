@@ -3,6 +3,7 @@ import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
 import { emit } from "nodemon";
 import dataGenerator from "dummy-data-generator";
+import { type } from "os";
 const multer = require("multer");
 const csv = require("csv-parser");
 const fs = require("fs");
@@ -56,7 +57,6 @@ const GiveConsents = async (request, response) => {
     const { name, email, consent_for } = consentDetail;
 
     const validateEmail = await consentModel.find({ email: email });
-    console.log(validateEmail);
 
     if (validateEmail.length !== 0) {
       response
@@ -162,57 +162,49 @@ const deleteConsent = async (request, response) => {
   }
 };
 
+const convertIntoJson = (resArray, FromFileData) => {
+  let jsonData = [];
+  let headers = resArray[0].split(",");
+
+  for (let i = 1; i < resArray.length; i++) {
+    let data = resArray[i].split(",");
+
+    if (headers.length === data.length) {
+      let obj = {};
+      for (let j = 0; j < data.length; j++) {
+        const value = FromFileData
+          ? data[j].trim()
+          : JSON.parse(data[j].trim());
+
+        obj[headers[j].trim()] = value;
+      }
+
+      jsonData.push(obj);
+    }
+  }
+  JSON.stringify(jsonData);
+  return jsonData;
+};
+
 const FromFileData = async (request, response) => {
   try {
     const { filedata } = request.files;
     const { data, name } = filedata;
     const result = await data.toString();
     const resArray = result.split("\n");
-    const count = resArray.length - 1;
 
-    let jsonObj = [];
-    let headers = resArray[0].split(",");
+    const jsonData = convertIntoJson(resArray, true);
 
-    for (let i = 1; i < resArray.length; i++) {
-      let data = resArray[i].split(",");
-      // console.log(data);
-      if (headers.length === data.length) {
-        let obj = {};
-        for (let j = 0; j < data.length; j++) {
-          obj[headers[j].trim()] = data[j].trim();
-        }
-        jsonObj.push(obj);
-      }
-    }
-    JSON.stringify(jsonObj);
     const validatedData = [];
-    for (let record of jsonObj) {
-      // console.log(record.email);
+    for (let record of jsonData) {
       const data = await consentModel.find({ email: record.email });
-      console.log(data);
+
       if (data.length === 0) {
         validatedData.push(record);
       }
     }
-    console.log(validatedData);
+
     await consentModel.insertMany(validatedData);
-
-    // for (let i = 1; i <= count - 1; i++) {
-    //   const data = resArray[i].split(",");
-    //   if (data !== undefined) {
-    //     const name = data[0];
-    //     const email = data[1];
-    //     const consentFor = data[2];
-    //     // console.log(name, email);
-    //     const object = new consentModel({
-    //       name,
-    //       email,
-    //       consentFor,
-    //     });
-
-    //     await object.save();
-    //   }
-    // }
 
     response
       .status(200)
@@ -241,33 +233,14 @@ const generateCSV = async (request, response) => {
 
     const randomData = dataGenerator({
       columnData,
-      count: 5,
+      count: 1,
       isCSV: true,
     });
 
-    console.log(randomData);
-    const res = randomData.split("\r\n");
-    const headers = res[0].split(",");
-    console.log(headers);
-    console.log(res);
+    const resArray = randomData.split("\r\n");
 
-    const jsonData = [];
-    JSON.stringify(res);
-    console.log(res);
-    for (let i = 1; i < res.length; i++) {
-      let data = res[i].split(",");
+    const jsonData = convertIntoJson(resArray);
 
-      console.log("data::", data);
-      const obj = {};
-      for (let j = 0; j < headers.length; j++) {
-        obj[headers[j]] = JSON.parse(data[j]);
-      }
-      console.log("obj:::", obj);
-      jsonData.push(obj);
-    }
-
-    JSON.stringify(jsonData);
-    console.log(jsonData);
     await consentModel.insertMany(jsonData);
 
     response

@@ -9,7 +9,7 @@ const logger = {
     format: winston.format.json(),
     transports: [
       new winston.transports.File({
-        filename: `${LOGS_PATH}/${todayDate}_error.log`, //logs/date_error.log
+        filename: `${LOGS_PATH}/${todayDate}_error.log`,
       }),
     ],
   }),
