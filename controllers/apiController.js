@@ -1,13 +1,9 @@
 import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
-import { emit } from "nodemon";
 import dataGenerator from "dummy-data-generator";
-import { type } from "os";
-import { upload } from "../middleware";
-
-const csv = require("csv-parser");
-const fs = require("fs");
+import fs from "fs";
+const { parse } = require("csv-parse");
 
 const { ObjectId } = require("mongodb");
 
@@ -189,27 +185,23 @@ const convertIntoJson = (resArray, FromFileData) => {
 
 const FromFileData = async (request, response) => {
   try {
-    const { filedata } = request.files;
-    const { data, name } = filedata;
-    const result = await data.toString();
-    const resArray = result.split("\n");
-
-    const jsonData = convertIntoJson(resArray, true);
-
     const validatedData = [];
-    for (let record of jsonData) {
-      const data = await consentModel.find({ email: record.email });
-
-      if (data.length === 0) {
-        validatedData.push(record);
+    const parser = parse({ columns: true }, async (error, records) => {
+      for (let record of records) {
+        const data = await consentModel.find({ email: record.email });
+        if (data.length === 0) {
+          validatedData.push(record);
+        }
       }
-    }
 
-    await consentModel.insertMany(validatedData);
+      await consentModel.insertMany(validatedData);
+      fs.unlinkSync("./uploads/data.csv");
 
-    response
-      .status(200)
-      .send({ success: true, data: "Data Added successfully!" });
+      response
+        .status(200)
+        .send({ success: true, data: "Data Added successfully!" });
+    });
+    fs.createReadStream("./uploads/data.csv").pipe(parser);
   } catch (error) {
     response.send({ success: false, message: error.message });
   }

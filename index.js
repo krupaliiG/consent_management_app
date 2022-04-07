@@ -4,7 +4,7 @@ import allRoutes from "./routes/all.route";
 const app = express();
 import bodyParser from "body-parser";
 import { INTERNAL_LINKS } from "./constant";
-
+import morgan from "morgan";
 // app.use(fileUpload());
 
 require("dotenv").config({ path: ".env" });
@@ -36,6 +36,7 @@ app.use(
 );
 
 app.use(bodyParser.json({ limit: "50mb" }));
+app.use(morgan("dev"));
 
 allRoutes(app);
 

@@ -32,7 +32,11 @@ export default express
     authentication,
     consent.deleteConsent
   )
-  .post(INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT, consent.FromFileData)
+  .post(
+    INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT,
+    upload.single("filedata"),
+    consent.FromFileData
+  )
   .get(INTERNAL_LINKS.CONSENT.GENERATE_CSV, consent.generateCSV)
   .post(
     INTERNAL_LINKS.CONSENT.UPLOAD_IMG,
