@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 import { errorLogger } from "../utils";
+import { response } from "express";
+import generator from "generate-password";
+// const Email = require("email-templates");
+const nodemailer = require("nodemailer");
 
 const RegisterUser = async (request, response) => {
   try {
@@ -22,6 +26,56 @@ const RegisterUser = async (request, response) => {
       .send({ success: true, message: "Registration Successfull!" });
   } catch (error) {
     errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
+  }
+};
+
+const randomPasswordRegistration = async (request, response) => {
+  try {
+    const { username, email } = request.body;
+    const password = generator.generate({
+      length: 10,
+      numbers: true,
+    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const data = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await data.save();
+
+    const transporter = nodemailer.createTransport({
+      port: 465,
+      host: "smtp.gmail.com",
+      auth: {
+        user: "krupali.igenerate@gmail.com",
+        pass: "Krupali@1289",
+      },
+      secure: true,
+    });
+
+    const mailData = {
+      from: "krupali.igenerate@gmail.com",
+      to: "krupali.igenerate@gmail.com",
+      subject: "Password Authentication",
+      text: `Registration successfull! Your password is ${password}. Thank you.`,
+    };
+
+    transporter.sendMail(mailData, (error, info) => {
+      if (error) {
+        response
+          .status(400)
+          .send({ success: false, message: error.message || message });
+      }
+      response.status(200).send({
+        success: true,
+        message:
+          "Registration successfull! Email sent to you on your registered email Id",
+      });
+    });
+  } catch (error) {
     response.status(400).send({ success: false, message: error.message });
   }
 };
@@ -135,6 +189,7 @@ const UserDetail = async (request, response) => {
 
 export default {
   RegisterUser,
+  randomPasswordRegistration,
   LoginUser,
   ChangePassword,
   Users,

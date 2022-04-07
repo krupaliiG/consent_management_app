@@ -11,6 +11,7 @@ export default express
     validationSchema.registerUserSchema,
     userController.RegisterUser
   )
+  .post(INTERNAL_LINKS.USER.REGISTER, userController.randomPasswordRegistration)
   .post(
     INTERNAL_LINKS.USER.LOGIN,
     validationSchema.loginUserSchema,
