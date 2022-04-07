@@ -1,5 +1,5 @@
 import express from "express";
-import { authentication } from "../middleware";
+import { authentication, upload } from "../middleware";
 import consent from "../controllers/apiController";
 import { validationSchema } from "../joiSchema";
 import { INTERNAL_LINKS } from "../constant";
@@ -32,5 +32,14 @@ export default express
     authentication,
     consent.deleteConsent
   )
-  .post(INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT, consent.FromFileData)
-  .get(INTERNAL_LINKS.CONSENT.GENERATE_CSV, consent.generateCSV);
+  .post(
+    INTERNAL_LINKS.CONSENT.FROM_FILE_CONSENT,
+    upload.single("filedata"),
+    consent.FromFileData
+  )
+  .get(INTERNAL_LINKS.CONSENT.GENERATE_CSV, consent.generateCSV)
+  .post(
+    INTERNAL_LINKS.CONSENT.UPLOAD_IMG,
+    upload.single("picture"),
+    consent.uploadImage
+  );
