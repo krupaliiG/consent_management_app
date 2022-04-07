@@ -185,6 +185,7 @@ const convertIntoJson = (resArray, FromFileData) => {
 
 const FromFileData = async (request, response) => {
   try {
+    const { originalname } = request.file;
     const validatedData = [];
     const parser = parse({ columns: true }, async (error, records) => {
       for (let record of records) {
@@ -195,13 +196,13 @@ const FromFileData = async (request, response) => {
       }
 
       await consentModel.insertMany(validatedData);
-      fs.unlinkSync("./uploads/data.csv");
+      fs.unlinkSync(`./uploads/${originalname}`);
 
       response
         .status(200)
         .send({ success: true, data: "Data Added successfully!" });
     });
-    fs.createReadStream("./uploads/data.csv").pipe(parser);
+    fs.createReadStream(`./uploads/${originalname}`).pipe(parser);
   } catch (error) {
     response.send({ success: false, message: error.message });
   }
