@@ -58,7 +58,7 @@ const randomPasswordRegistration = async (request, response) => {
 
     const mailData = {
       from: "krupali.igenerate@gmail.com",
-      to: "krupali.igenerate@gmail.com",
+      to: email,
       subject: "Password Authentication",
       text: `Registration successfull! Your password is ${password}. Thank you.`,
     };
