@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 import { errorLogger } from "../utils";
+import { response } from "express";
+import generator from "generate-password";
+const nodemailer = require("nodemailer");
+require("dotenv").config({ path: "../.env" });
 
 const RegisterUser = async (request, response) => {
   try {
@@ -22,6 +26,60 @@ const RegisterUser = async (request, response) => {
       .send({ success: true, message: "Registration Successfull!" });
   } catch (error) {
     errorLogger(error.message || error, request.originalUrl);
+    response.status(400).send({ success: false, message: error.message });
+  }
+};
+
+const randomPasswordRegistration = async (request, response) => {
+  try {
+    const { username, email } = request.body;
+    const password = generator.generate({
+      length: 10,
+      numbers: true,
+    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const data = new userModel({
+      username,
+      email,
+      password: hashedPassword,
+    });
+
+    await data.save();
+    const port = process.env.email_port;
+    const host = process.env.email_host;
+    const user = process.env.email_user;
+    const pass = process.env.email_pass;
+
+    const transporter = nodemailer.createTransport({
+      port: port,
+      host: host,
+      auth: {
+        user: user,
+        pass: pass,
+      },
+      secure: true,
+    });
+
+    const mailData = {
+      from: "krupali.igenerate@gmail.com",
+      to: email,
+      subject: "Password Authentication",
+      text: `Registration successfull! Your password is ${password}. Thank you.`,
+    };
+
+    transporter.sendMail(mailData, (error, info) => {
+      if (error) {
+        response
+          .status(400)
+          .send({ success: false, message: error.message || message });
+      }
+      response.status(200).send({
+        success: true,
+        message:
+          "Registration successfull! Email sent to you on your registered email Id",
+      });
+    });
+  } catch (error) {
     response.status(400).send({ success: false, message: error.message });
   }
 };
@@ -135,6 +193,7 @@ const UserDetail = async (request, response) => {
 
 export default {
   RegisterUser,
+  randomPasswordRegistration,
   LoginUser,
   ChangePassword,
   Users,

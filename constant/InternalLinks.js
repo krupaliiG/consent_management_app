@@ -4,6 +4,7 @@ export default {
   USER: {
     BASE_URL: "/api/v1/users",
     SIGNUP: "/signup",
+    REGISTER: "/randomPassword",
     LOGIN: "/login",
     CHANGE_PASSWORD: "/change-password",
     USER_DETAIL: "/userdetail",

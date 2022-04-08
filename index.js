@@ -29,7 +29,7 @@ mongoose
 
 app.use(
   bodyParser.urlencoded({
-    extended: true,
+    extended: false,
     limit: "50mb",
     parameterLimit: 1000000,
   })
