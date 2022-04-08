@@ -5,8 +5,8 @@ const { ObjectId } = require("mongodb");
 import { errorLogger } from "../utils";
 import { response } from "express";
 import generator from "generate-password";
-// const Email = require("email-templates");
 const nodemailer = require("nodemailer");
+require("dotenv").config({ path: "../.env" });
 
 const RegisterUser = async (request, response) => {
   try {
@@ -45,13 +45,17 @@ const randomPasswordRegistration = async (request, response) => {
     });
 
     await data.save();
+    const port = process.env.email_port;
+    const host = process.env.email_host;
+    const user = process.env.email_user;
+    const pass = process.env.email_pass;
 
     const transporter = nodemailer.createTransport({
-      port: 465,
-      host: "smtp.gmail.com",
+      port: port,
+      host: host,
       auth: {
-        user: "krupali.igenerate@gmail.com",
-        pass: "Krupali@1289",
+        user: user,
+        pass: pass,
       },
       secure: true,
     });
