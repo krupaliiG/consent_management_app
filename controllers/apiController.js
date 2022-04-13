@@ -39,7 +39,7 @@ const ListConsents = async (request, response) => {
 
     response.status(200).send({ success: true, data: data });
   } catch (error) {
-    errorLogger(error.message || ererrorr, request.originalUrl);
+    errorLogger(error.message || error, request.originalUrl);
     response.status(400).send({ success: false, message: error.message });
   }
 };
@@ -47,8 +47,7 @@ const ListConsents = async (request, response) => {
 const GiveConsents = async (request, response) => {
   try {
     infoLogger(request.body, request.originalUrl);
-    const { _id } = request.data;
-
+    const { _id } = request.currentUser;
     const consentDetail = request.body;
     infoLogger(request.query, request.originalUrl);
     const { name, email, consent_for } = consentDetail;
@@ -58,7 +57,7 @@ const GiveConsents = async (request, response) => {
     if (validateEmail.length !== 0) {
       response
         .status(200)
-        .send({ success: true, message: "Email Already exists!" });
+        .send({ success: false, message: "Email Already exists!" });
     } else {
       const data = new consentModel({
         name,
@@ -125,7 +124,7 @@ const GroupConsents = async (request, response) => {
 
 const updateConsent = async (request, response) => {
   try {
-    const { _id } = request.data;
+    const { _id } = request.currentUser;
 
     const id = request.params;
     const updateData = request.body;

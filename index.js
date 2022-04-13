@@ -1,3 +1,4 @@
+require("dotenv").config({ path: ".env" });
 import express from "express";
 // const fileUpload = require("express-fileupload");
 import allRoutes from "./routes/all.route";
@@ -6,8 +7,6 @@ import bodyParser from "body-parser";
 import { INTERNAL_LINKS } from "./constant";
 import morgan from "morgan";
 // app.use(fileUpload());
-
-require("dotenv").config({ path: ".env" });
 
 import dbConfig from "./config/dbConfig.js";
 import mongoose from "mongoose";
@@ -41,7 +40,7 @@ app.use(morgan("dev"));
 allRoutes(app);
 
 const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const BASE_API_URL = INTERNAL_LINKS.BASE_API_URL;
 
 app.listen(PORT, () => {

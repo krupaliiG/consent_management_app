@@ -18,6 +18,7 @@ const validateRequest = (request, response, next, schema) => {
       next();
     }
   } catch (error) {
+    console.log(error.message);
     response.status(400).send({ success: false, message: error.message });
   }
 };

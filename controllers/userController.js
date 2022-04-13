@@ -3,27 +3,38 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { ObjectId } = require("mongodb");
 import { errorLogger } from "../utils";
-import { response } from "express";
 import generator from "generate-password";
-const nodemailer = require("nodemailer");
-require("dotenv").config({ path: "../.env" });
+import { userService } from "../mongoServices";
+import { transporter } from "../utils";
+import { hashPassword } from "../utils";
 
 const RegisterUser = async (request, response) => {
   try {
-    const userDetail = request.body;
-    const { username, email, password } = userDetail;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const {
+      body: { username, email, password },
+    } = request;
 
-    const data = new userModel({
-      username,
-      email,
-      password: hashedPassword,
-    });
+    const validateEmail = await userService.findOneQuery(email);
 
-    await data.save();
-    response
-      .status(200)
-      .send({ success: true, message: "Registration Successfull!" });
+    if (validateEmail.length) {
+      response
+        .status(400)
+        .send({ success: false, message: "Email Already exists!" });
+    } else {
+      const hashedPassword = await hashPassword(password);
+
+      const obj = {
+        username,
+        email,
+        password: hashedPassword,
+      };
+
+      const data = await userService.insertOne(obj);
+
+      response
+        .status(200)
+        .send({ success: true, message: "Registration Successfull!" });
+    }
   } catch (error) {
     errorLogger(error.message || error, request.originalUrl);
     response.status(400).send({ success: false, message: error.message });
@@ -37,42 +48,25 @@ const randomPasswordRegistration = async (request, response) => {
       length: 10,
       numbers: true,
     });
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const data = new userModel({
+    const hashedPassword = await hashPassword(password);
+    const obj = {
       username,
       email,
       password: hashedPassword,
-    });
+    };
 
-    await data.save();
-    const port = process.env.email_port;
-    const host = process.env.email_host;
-    const user = process.env.email_user;
-    const pass = process.env.email_pass;
-
-    const transporter = nodemailer.createTransport({
-      port: port,
-      host: host,
-      auth: {
-        user: user,
-        pass: pass,
-      },
-      secure: true,
-    });
+    const data = await userService.insertOne(obj);
+    const fromEmail = process.env.fromEmail;
 
     const mailData = {
-      from: "krupali.igenerate@gmail.com",
+      from: fromEmail,
       to: email,
       subject: "Password Authentication",
       text: `Registration successfull! Your password is ${password}. Thank you.`,
     };
 
     transporter.sendMail(mailData, (error, info) => {
-      if (error) {
-        response
-          .status(400)
-          .send({ success: false, message: error.message || message });
-      }
+      if (error) throw new Error();
       response.status(200).send({
         success: true,
         message:
@@ -121,7 +115,7 @@ const LoginUser = async (request, response) => {
 
 const ChangePassword = async (request, response) => {
   try {
-    const { _id } = request.data;
+    const { _id } = request.currentUser;
 
     const updatedData = request.body;
 
@@ -166,7 +160,7 @@ const Users = async (request, response) => {
 
 const UserDetail = async (request, response) => {
   try {
-    const { _id } = request.data;
+    const { _id } = request.currentUser;
     const { page = 0, limit = 1, name = "" } = request.query;
 
     const data = await userModel.aggregate([
