@@ -2,6 +2,7 @@ import { consentModel } from "../models";
 import { response, request } from "express";
 import { errorLogger, infoLogger } from "../utils";
 import dataGenerator from "dummy-data-generator";
+import { s3Upload } from "../utils";
 import fs from "fs";
 const { parse } = require("csv-parse");
 
@@ -248,9 +249,15 @@ const generateCSV = async (request, response) => {
 
 const uploadImage = async (request, response) => {
   try {
-    response
-      .status(200)
-      .send({ success: true, message: "File uploaded successfully!" });
+    console.log(request.file);
+    const data = await s3Upload(request.file.path);
+    console.log(data);
+    if (!data) throw new Error();
+    else {
+      response
+        .status(200)
+        .send({ success: true, message: "File uploaded successfully!" });
+    }
   } catch (error) {
     response.status(400).send({ success: false, message: error.message });
   }
