@@ -149,6 +149,12 @@ const updateConsent = async (request, response) => {
 const deleteConsent = async (request, response) => {
   try {
     const id = request.params;
+
+    if (!id) {
+      console.log("id is not available!");
+    } else {
+      console.log(id);
+    }
     const data = await consentModel.findByIdAndDelete(ObjectId(id));
     response
       .status(200)
@@ -263,6 +269,38 @@ const uploadImage = async (request, response) => {
   }
 };
 
+const accountSid = process.env.TWILIO_ACCOUNTSID;
+const authToken = process.env.TWILIO_AUTHTOKEN;
+
+const twillioCall = async (request, response) => {
+  try {
+    console.log("accountSid:::", accountSid);
+    console.log("authToken:::", authToken);
+
+    const client = require("twilio")(accountSid, authToken);
+
+    const msg = await client.messages.create({
+      to: "whatsapp:+917284045036",
+      body: "Hello! This is an editable text message. You are free to change it and write whatever you like.",
+      from: "whatsapp:+14155238886",
+    });
+
+    response.send(msg);
+
+    // client.messages
+    //   .create({
+    //     body: "Hello from Node",
+    //     to: "+12345678901", // Text this number
+    //     from: "+12345678901", // From a valid Twilio number
+    //   })
+    //   .then((message) => console.log(message.sid));
+    response.send("Hello!");
+  } catch (error) {
+    console.log(error);
+    response.send(error.message);
+  }
+};
+
 export default {
   ListConsents,
   GroupConsents,
@@ -272,4 +310,5 @@ export default {
   FromFileData,
   generateCSV,
   uploadImage,
+  twillioCall,
 };

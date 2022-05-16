@@ -42,4 +42,5 @@ export default express
     INTERNAL_LINKS.CONSENT.UPLOAD_IMG,
     upload.single("picture"),
     consent.uploadImage
-  );
+  )
+  .post(INTERNAL_LINKS.CONSENT.TWILLIO, consent.twillioCall);

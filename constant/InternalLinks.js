@@ -21,5 +21,6 @@ export default {
     FROM_FILE_CONSENT: "/fromfile",
     GENERATE_CSV: "/generatecsv",
     UPLOAD_IMG: "/uploadimg",
+    TWILLIO: "/twillio",
   },
 };
